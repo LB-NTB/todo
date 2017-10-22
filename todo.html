@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<title>Page Title</title>
+</head>
+<body>
+	<h1>ToDo List</h1>
+	<p>Taks eingeben:</p>
+
+	<button id="listAll" type="button">show items</button>
+
+	<form action="/create" method="POST" name="myForm" id="form">
+	    <label for="name">Enter task: </label>
+	    <input type="text" name="pendenz" value="Pendenz">
+	    <input type="submit" value="OK" id="submit">
+	</form>
+
+	<p id="ausgabe"></p>
+	<ul id="list">
+		
+	</ul>
+
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        
+        $("#listAll").click(function(){
+            $.ajax({
+                type: 'GET',
+                url: 'listTasks',
+                success: function(data){ 
+                	var json = JSON.parse(data);
+                	$('#list li').remove(); // Liste löschen
+                	json.forEach(function(item){ // Liste neu aufbauen
+                    	$("#list").append($("<li>").text(item.task));
+                		console.log(data);
+                	})
+                    //$("#ausgabe").text(data);
+                }
+            });
+
+    	});
+
+	});
+</script>
+
+
+</body>
+</html>
+
+
