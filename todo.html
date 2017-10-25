@@ -8,39 +8,80 @@
 	<h1>ToDo List</h1>
 	<p>Taks eingeben:</p>
 
-	<button id="listAll" type="button">show items</button>
+	<button id="listOpen" type="button">show open items</button>
+	<button id="listClosed" type="button">show closed items</button>
+	<button id="listAll" type="button">show all items</button>
 
 	<form action="/create" method="POST" name="myForm" id="form">
 	    <label for="name">Enter task: </label>
 	    <input type="text" name="pendenz" value="Pendenz">
-	    <input type="submit" value="OK" id="submit">
+	    <input type="submit" value="Add" id="submit">
 	</form>
 
 	<p id="ausgabe"></p>
 	<ul id="list">
-		
+		<!-- hier kommen die Tasks hin -->
 	</ul>
 
 
 <script type="text/javascript">
     $(document).ready(function(){
+
+
+
+        function checkboxChanged() {
+             console.log("Checkbox changed");
+        }
+
+        // Liste erstellen
+        function listItems(data, callback){
+            var json = JSON.parse(data);
+                    $('#list li').remove();         // Liste löschen
+                    json.forEach(function(item){    // Liste neu aufbauen
+                        $("#list").append('<li><input type="checkbox" class="checkbox" id='+item.taskid+'><label>'+item.task+'</label></li>');
+                    })
+                    $(".checkbox").on('click', checkboxChanged); // EventHandler
+        }
+    	  
+        // Neuer Task an Server senden und Liste aktualisieren d.h. neu aufbauen
+        $("#form").submit(function(event){
+        	var formData = {'pendenz' : $('input[name=pendenz]').val()};
+        	$.ajax({
+                type: 'POST',
+                url:  'create',
+                data: formData
+            })
+            .done(listItems)
+        	event.preventDefault();
+        });
         
+        // Filter: alle Task anzeigen ( = Filter löschen)
         $("#listAll").click(function(){
             $.ajax({
                 type: 'GET',
-                url: 'listTasks',
-                success: function(data){ 
-                	var json = JSON.parse(data);
-                	$('#list li').remove(); // Liste löschen
-                	json.forEach(function(item){ // Liste neu aufbauen
-                    	$("#list").append($("<li>").text(item.task));
-                		console.log(data);
-                	})
-                    //$("#ausgabe").text(data);
-                }
-            });
-
+                url: 'listTasks'  
+            })
+            .done(listItems)
     	});
+
+        // Filter: nur geschlossene Tasks anzeigen
+        $("#listClosed").click(function(){
+            $.ajax({
+                type: 'GET',
+                url: 'listClosedTasks'
+            })
+            .done(listItems)   
+    	});
+
+        // Filter: nur offene Tasks anzeigen
+    	$("#listOpen").click(function(){
+            $.ajax({
+                type: 'GET',
+                url: 'listOpenTasks',
+            })
+            .done(listItems)   
+        });
+
 
 	});
 </script>
