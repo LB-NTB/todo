@@ -2,7 +2,7 @@
 <html>
 <head>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<title>Page Title</title>
+	<title>toDoo</title>
 </head>
 <body>
 	<h1>ToDo List</h1>
@@ -28,19 +28,47 @@
     $(document).ready(function(){
 
 
-
+        // wenn Checkbox geändert wird
         function checkboxChanged() {
-             console.log("Checkbox changed");
+            console.log("Checkbox changed");
+
+            //if ($(this).prop('checked') == 'true') {
+
+            if ($(this)[0].hasAttribute('checked') == true) {
+                console.log('status ist checked');
+                var formData = {
+                'id'      : $(this).attr('id'),
+                'status' : 'unchecked' 
+                }
+            } else {
+                console.log('status ist unchecked');
+                var formData = {
+                'id'      : $(this).attr('id'),
+                'status'  : 'checked'
+                }
+            }; 
+            $.ajax({
+                type: 'POST',
+                url:  'updateItem',
+                data: formData  
+            })
+            .done(listItems)
         }
 
         // Liste erstellen
         function listItems(data, callback){
             var json = JSON.parse(data);
-                    $('#list li').remove();         // Liste löschen
-                    json.forEach(function(item){    // Liste neu aufbauen
-                        $("#list").append('<li><input type="checkbox" class="checkbox" id='+item.taskid+'><label>'+item.task+'</label></li>');
-                    })
-                    $(".checkbox").on('click', checkboxChanged); // EventHandler
+            
+                $('#list li').remove();         // Liste löschen
+                json.forEach(function(item){    // Liste neu aufbauen
+                    if ($(item).prop('status') == 'checked') {
+                        $("#list").append('<li><input type="checkbox" id='+item.taskid+' checked><label>'+item.task+'</label></li>');
+                    }
+                    else {
+                        $("#list").append('<li><input type="checkbox" id='+item.taskid+'><label>'+item.task+'</label></li>');    
+                    }
+                });
+                $("input:checkbox").on('click', checkboxChanged); // EventHandler
         }
     	  
         // Neuer Task an Server senden und Liste aktualisieren d.h. neu aufbauen

@@ -4,7 +4,7 @@ var bodyParser 	= require('body-parser');
 var app 		= express();
 
 app.use(express.static(__dirname + "/public"));
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 var jsonParser 	= bodyParser.json()
@@ -13,7 +13,7 @@ var tasks = [
 	{
 	taskid: 	1,
 	task: 		"initial Task",
-	checked: 	true
+	status: 	'checked'
 	}
 ];
 var task = "";
@@ -25,12 +25,24 @@ app.get('/', function (req, res) {
 	res.sendFile(path.join(__dirname + '/todo.html'));
 });
 
+app.post('/updateItem', function(req,res) {
+	console.log('Funktoin updateItem');
+	tasks.forEach(function(taskItem){
+		if (taskItem.taskid == req.body.id) {
+			console.log('item gefunden');
+			taskItem.status = req.body.status;
+			console.log(req.body.status);
+		};
+	});
+	res.json(JSON.stringify(tasks));	
+});
+
 app.post('/create', function(req, res) {
 	taskimport = req.body.pendenz;
 	task = {
 		taskid: 1 + id,
-		task: taskimport,
-		checked: false
+		task: 	taskimport,
+		status: 'unchecked'
 	};
 	id++;
 	tasks.push(task);
@@ -41,10 +53,9 @@ app.get('/listTasks', function(req, res) {
 	res.json(JSON.stringify(tasks));
 });
 
-
 app.get('/listClosedTasks', function(req, res) {
 	var closedTasks = tasks.filter(function(taskItem){
-		if (taskItem.checked == true){
+		if (taskItem.status == 'checked'){
 			return true;
 		}
 		return false;
@@ -52,10 +63,9 @@ app.get('/listClosedTasks', function(req, res) {
 	res.json(JSON.stringify(closedTasks));
 });
 
-
 app.get('/listOpenTasks', function(req, res) {
 	var openTasks = tasks.filter(function(taskItem){
-		if (taskItem.checked == false){
+		if (taskItem.status == 'unchecked'){
 			return true;
 		}
 		return false;
