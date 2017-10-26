@@ -9,14 +9,8 @@ app.use(bodyParser.json())
 
 var jsonParser 	= bodyParser.json()
 
-var tasks = [
-	{
-	taskid: 	1,
-	task: 		"initial Task",
-	status: 	'checked'
-	}
-];
-var task = "";
+var tasks = [];
+var task  = "";
 var taskimport = "";
 var id = 1;
 
@@ -26,12 +20,9 @@ app.get('/', function (req, res) {
 });
 
 app.post('/updateItem', function(req,res) {
-	console.log('Funktoin updateItem');
 	tasks.forEach(function(taskItem){
 		if (taskItem.taskid == req.body.id) {
-			console.log('item gefunden');
 			taskItem.status = req.body.status;
-			console.log(req.body.status);
 		};
 	});
 	res.json(JSON.stringify(tasks));	
